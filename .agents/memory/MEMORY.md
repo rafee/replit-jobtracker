@@ -1,0 +1,1 @@
+- [LLM provider preference](llm-provider-preference.md) — keep user-directed prompts and provider credentials extensible; Gemini is the initial model.

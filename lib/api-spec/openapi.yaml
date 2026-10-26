@@ -10,7 +10,229 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: job-search
+    description: Job discovery and application tracking
+  - name: profile
+    description: Candidate profile and resume source material
 paths:
+  /profile:
+    get:
+      operationId: getProfile
+      tags: [profile]
+      summary: Get candidate profile
+      responses:
+        "200":
+          description: Candidate profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CandidateProfile"
+    put:
+      operationId: saveProfile
+      tags: [profile]
+      summary: Save candidate profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CandidateProfileInput"
+      responses:
+        "200":
+          description: Updated candidate profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CandidateProfile"
+  /dashboard:
+    get:
+      operationId: getDashboard
+      tags: [job-search]
+      summary: Get application pipeline summary
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+  /jobs/search:
+    post:
+      operationId: searchJobs
+      tags: [job-search]
+      summary: Search live job postings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JobSearchInput"
+      responses:
+        "200":
+          description: Search results from the connected job source
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobSearchResponse"
+  /jobs:
+    get:
+      operationId: listJobs
+      tags: [job-search]
+      summary: List tracked jobs
+      parameters:
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [saved, applied, interviewing, offer, rejected, withdrawn]
+      responses:
+        "200":
+          description: Tracked jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TrackedJob"
+    post:
+      operationId: saveJob
+      tags: [job-search]
+      summary: Save a job to the tracker
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TrackedJobInput"
+      responses:
+        "201":
+          description: Saved job
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TrackedJob"
+  /jobs/{jobId}:
+    patch:
+      operationId: updateJob
+      tags: [job-search]
+      summary: Update a tracked job
+      parameters:
+        - in: path
+          name: jobId
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TrackedJobUpdate"
+      responses:
+        "200":
+          description: Updated tracked job
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TrackedJob"
+    delete:
+      operationId: deleteJob
+      tags: [job-search]
+      summary: Remove a tracked job
+      parameters:
+        - in: path
+          name: jobId
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Job removed
+  /jobs/{jobId}/resume-drafts:
+    get:
+      operationId: listResumeDrafts
+      tags: [job-search]
+      summary: List tailored resume drafts for a job
+      parameters:
+        - in: path
+          name: jobId
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Resume drafts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ResumeDraft"
+    post:
+      operationId: createResumeDraft
+      tags: [job-search]
+      summary: Generate a tailored resume draft
+      parameters:
+        - in: path
+          name: jobId
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResumeDraftInput"
+      responses:
+        "201":
+          description: Generated resume draft
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResumeDraft"
+  /resume-drafts/{draftId}:
+    patch:
+      operationId: updateResumeDraft
+      tags: [job-search]
+      summary: Edit a tailored resume draft
+      parameters:
+        - in: path
+          name: draftId
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResumeDraftUpdate"
+      responses:
+        "200":
+          description: Updated resume draft
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResumeDraft"
+  /resume-drafts/{draftId}/download:
+    get:
+      operationId: downloadResumeDraft
+      tags: [job-search]
+      summary: Download a resume draft as plain text
+      parameters:
+        - in: path
+          name: draftId
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Resume draft text file
+          content:
+            text/plain:
+              schema:
+                type: string
   /healthz:
     get:
       operationId: healthCheck
@@ -26,6 +248,143 @@ paths:
                 $ref: "#/components/schemas/HealthStatus"
 components:
   schemas:
+    CandidateProfile:
+      type: object
+      required: [fullName, baseResume, linkedinNotes, targetTitles, location, countryCode, remoteOnly, minSalaryUsd, maxSalaryUsd, promptPreferences, updatedAt]
+      properties:
+        fullName: { type: string }
+        baseResume: { type: string }
+        linkedinNotes: { type: string }
+        targetTitles: { type: array, items: { type: string } }
+        location: { type: string }
+        countryCode: { type: string }
+        remoteOnly: { type: boolean }
+        minSalaryUsd: { type: ["integer", "null"] }
+        maxSalaryUsd: { type: ["integer", "null"] }
+        promptPreferences: { type: string }
+        updatedAt: { type: string, format: date-time }
+    CandidateProfileInput:
+      type: object
+      required: [fullName, baseResume, linkedinNotes, targetTitles, location, countryCode, remoteOnly, minSalaryUsd, maxSalaryUsd, promptPreferences]
+      properties:
+        fullName: { type: string, maxLength: 200 }
+        baseResume: { type: string, maxLength: 50000 }
+        linkedinNotes: { type: string, maxLength: 20000 }
+        targetTitles: { type: array, items: { type: string, maxLength: 120 }, maxItems: 20 }
+        location: { type: string, maxLength: 200 }
+        countryCode: { type: string, minLength: 2, maxLength: 2 }
+        remoteOnly: { type: boolean }
+        minSalaryUsd: { type: ["integer", "null"], minimum: 0 }
+        maxSalaryUsd: { type: ["integer", "null"], minimum: 0 }
+        promptPreferences: { type: string, maxLength: 4000 }
+    DashboardSummary:
+      type: object
+      required: [saved, applied, interviewing, offers, recentJobs]
+      properties:
+        saved: { type: integer }
+        applied: { type: integer }
+        interviewing: { type: integer }
+        offers: { type: integer }
+        recentJobs:
+          type: array
+          items: { $ref: "#/components/schemas/TrackedJob" }
+    JobSearchInput:
+      type: object
+      required: [jobTitle, location, countryCode, remote, postedWithinDays, limit]
+      properties:
+        jobTitle: { type: string, maxLength: 180 }
+        location: { type: string, maxLength: 200 }
+        countryCode: { type: string, minLength: 2, maxLength: 2 }
+        remote: { type: boolean }
+        postedWithinDays: { type: integer, minimum: 1, maximum: 90 }
+        limit: { type: integer, minimum: 1, maximum: 25 }
+        minSalaryUsd: { type: ["integer", "null"], minimum: 0 }
+        maxSalaryUsd: { type: ["integer", "null"], minimum: 0 }
+    JobSearchResult:
+      type: object
+      required: [sourceId, title, company, url, location, remote, postedAt, seniority, minSalaryUsd, maxSalaryUsd, description]
+      properties:
+        sourceId: { type: string }
+        title: { type: string }
+        company: { type: string }
+        url: { type: string }
+        location: { type: string }
+        remote: { type: boolean }
+        postedAt: { type: ["string", "null"], format: date-time }
+        seniority: { type: ["string", "null"] }
+        minSalaryUsd: { type: ["integer", "null"] }
+        maxSalaryUsd: { type: ["integer", "null"] }
+        description: { type: string }
+    JobSearchResponse:
+      type: object
+      required: [results, total]
+      properties:
+        results:
+          type: array
+          items: { $ref: "#/components/schemas/JobSearchResult" }
+        total: { type: integer }
+        truncated: { type: boolean }
+    TrackedJob:
+      type: object
+      required: [id, sourceId, title, company, url, location, remote, postedAt, seniority, minSalaryUsd, maxSalaryUsd, description, status, notes, createdAt, updatedAt]
+      properties:
+        id: { type: integer }
+        sourceId: { type: string }
+        title: { type: string }
+        company: { type: string }
+        url: { type: string }
+        location: { type: string }
+        remote: { type: boolean }
+        postedAt: { type: ["string", "null"], format: date-time }
+        seniority: { type: ["string", "null"] }
+        minSalaryUsd: { type: ["integer", "null"] }
+        maxSalaryUsd: { type: ["integer", "null"] }
+        description: { type: string }
+        status: { type: string, enum: [saved, applied, interviewing, offer, rejected, withdrawn] }
+        notes: { type: string }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    TrackedJobInput:
+      type: object
+      required: [sourceId, title, company, url, location, remote, postedAt, seniority, minSalaryUsd, maxSalaryUsd, description]
+      properties:
+        sourceId: { type: string, maxLength: 180 }
+        title: { type: string, maxLength: 300 }
+        company: { type: string, maxLength: 300 }
+        url: { type: string, format: uri }
+        location: { type: string, maxLength: 300 }
+        remote: { type: boolean }
+        postedAt: { type: ["string", "null"], format: date-time }
+        seniority: { type: ["string", "null"] }
+        minSalaryUsd: { type: ["integer", "null"], minimum: 0 }
+        maxSalaryUsd: { type: ["integer", "null"], minimum: 0 }
+        description: { type: string }
+    TrackedJobUpdate:
+      type: object
+      required: [status, notes]
+      properties:
+        status: { type: string, enum: [saved, applied, interviewing, offer, rejected, withdrawn] }
+        notes: { type: string, maxLength: 5000 }
+    ResumeDraft:
+      type: object
+      required: [id, jobId, prompt, content, createdAt, updatedAt]
+      properties:
+        id: { type: integer }
+        jobId: { type: integer }
+        prompt: { type: string }
+        content: { type: string }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    ResumeDraftInput:
+      type: object
+      required: [prompt]
+      properties:
+        prompt: { type: string, maxLength: 4000 }
+    ResumeDraftUpdate:
+      type: object
+      required: [content]
+      properties:
+        content: { type: string, minLength: 1, maxLength: 50000 }
     HealthStatus:
       type: object
       properties:

@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Job Search Assistant"
+description = "A personal job-search workspace that finds live postings from saved criteria, tracks applications, and creates Gemini-assisted resume drafts from a user's source resume and tailored prompts."
+version = "1.0.0"
+id = "artifacts/job-search-assistant"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 20399
+
+[services.development]
+run = "pnpm --filter @workspace/job-search-assistant run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/job-search-assistant", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/job-search-assistant/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "20399"
+BASE_PATH = "/"

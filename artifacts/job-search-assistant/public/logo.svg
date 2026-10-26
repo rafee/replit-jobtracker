@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 216 48">
+  <rect width="216" height="48" rx="12" fill="#28584d"/>
+  <g fill="none" stroke="#f0c879" stroke-linecap="round" stroke-width="4">
+    <path d="M15 32V17h8v15"/><path d="M27 32V13h8v19"/><path d="M39 32V20h8v12"/>
+  </g>
+  <text x="58" y="32" fill="#fbfaf5" font-family="DM Sans, sans-serif" font-size="23" font-weight="700" letter-spacing="-1">nextstep</text>
+</svg>
