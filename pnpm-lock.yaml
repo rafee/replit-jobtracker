@@ -39,9 +39,6 @@ catalogs:
     clsx:
       specifier: ^2.1.1
       version: 2.1.1
-    drizzle-orm:
-      specifier: ^0.45.2
-      version: 0.45.4
     framer-motion:
       specifier: ^12.23.24
       version: 12.43.0
@@ -161,10 +158,6 @@ overrides:
 importers:
 
   .:
-    dependencies:
-      '@replit/connectors-sdk':
-        specifier: ^0.4.3
-        version: 0.4.3
     devDependencies:
       prettier:
         specifier: ^3.9.10
@@ -172,73 +165,6 @@ importers:
       typescript:
         specifier: ~5.9.3
         version: 5.9.3
-
-  artifacts/api-server:
-    dependencies:
-      '@clerk/express':
-        specifier: ^2.1.83
-        version: 2.1.83(express@5.3.0)
-      '@clerk/shared':
-        specifier: ^4.41.1
-        version: 4.41.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@google/genai':
-        specifier: ^2.31.0
-        version: 2.31.0
-      '@replit/connectors-sdk':
-        specifier: ^0.4.3
-        version: 0.4.3
-      '@workspace/api-zod':
-        specifier: workspace:*
-        version: link:../../lib/api-zod
-      '@workspace/db':
-        specifier: workspace:*
-        version: link:../../lib/db
-      cookie-parser:
-        specifier: ^1.4.7
-        version: 1.4.7
-      cors:
-        specifier: ^2.8.6
-        version: 2.8.6
-      drizzle-orm:
-        specifier: 'catalog:'
-        version: 0.45.4(@types/pg@8.23.1)(pg@8.23.1)
-      express:
-        specifier: ^5.3.0
-        version: 5.3.0
-      http-proxy-middleware:
-        specifier: ^4.2.1
-        version: 4.2.1
-      pino:
-        specifier: ^9.14.0
-        version: 9.14.0
-      pino-http:
-        specifier: ^10.5.0
-        version: 10.5.0
-    devDependencies:
-      '@types/cookie-parser':
-        specifier: ^1.4.10
-        version: 1.4.10(@types/express@5.0.6)
-      '@types/cors':
-        specifier: ^2.8.19
-        version: 2.8.19
-      '@types/express':
-        specifier: ^5.0.6
-        version: 5.0.6
-      '@types/node':
-        specifier: 'catalog:'
-        version: 25.9.9
-      esbuild:
-        specifier: 0.28.2
-        version: 0.28.2
-      esbuild-plugin-pino:
-        specifier: ^2.3.3
-        version: 2.3.3(esbuild@0.28.2)(pino-pretty@13.2.0)(pino@9.14.0)(thread-stream@3.1.0)
-      pino-pretty:
-        specifier: ^13.2.0
-        version: 13.2.0
-      thread-stream:
-        specifier: 3.1.0
-        version: 3.1.0
 
   artifacts/job-search-assistant:
     dependencies:
@@ -639,31 +565,6 @@ importers:
       zod:
         specifier: 'catalog:'
         version: 3.25.76
-
-  lib/db:
-    dependencies:
-      drizzle-orm:
-        specifier: 'catalog:'
-        version: 0.45.4(@types/pg@8.23.1)(pg@8.23.1)
-      drizzle-zod:
-        specifier: ^0.8.3
-        version: 0.8.3(drizzle-orm@0.45.4(@types/pg@8.23.1)(pg@8.23.1))(zod@3.25.76)
-      pg:
-        specifier: ^8.23.1
-        version: 8.23.1
-      zod:
-        specifier: 'catalog:'
-        version: 3.25.76
-    devDependencies:
-      '@types/node':
-        specifier: 'catalog:'
-        version: 25.9.9
-      '@types/pg':
-        specifier: ^8.23.1
-        version: 8.23.1
-      drizzle-kit:
-        specifier: ^0.31.11
-        version: 0.31.11
 
   scripts:
     devDependencies:
